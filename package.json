@@ -1,0 +1,15 @@
+{
+  "name": "sr-opticals",
+  "version": "1.0.0",
+  "description": "SR OPTICALS - Premium Eyewear Full-Stack Platform",
+  "scripts": {
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "build": "npm run build:client && npm run build:server"
+  },
+  "keywords": ["optical", "eyewear", "glasses", "react", "express", "firebase"],
+  "author": "SR OPTICALS",
+  "license": "ISC"
+}

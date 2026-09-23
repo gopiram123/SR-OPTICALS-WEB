@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const storePhotosController_js_1 = require("../controllers/storePhotosController.js");
+const authMiddleware_js_1 = require("../middleware/authMiddleware.js");
+const router = (0, express_1.Router)();
+router.get('/', storePhotosController_js_1.getStorePhotos);
+router.post('/', authMiddleware_js_1.requireAdminAuth, storePhotosController_js_1.addStorePhoto);
+router.delete('/:id', authMiddleware_js_1.requireAdminAuth, storePhotosController_js_1.deleteStorePhoto);
+exports.default = router;
