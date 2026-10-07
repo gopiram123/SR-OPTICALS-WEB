@@ -18,6 +18,7 @@ import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getProducts, getCategories, getReviews, getStorePhotos } from '../../services/api';
 import { Product, Category, Review, StorePhoto } from '../../types';
 import { useShop } from '../../context/ShopContext';
+import { formatProductName } from '../../utils/formatters';
 
 export const AdminDashboardPage: React.FC = () => {
   const { shopInfo } = useShop();
@@ -263,11 +264,11 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <img
                     src={p.images[0]}
-                    alt={p.name}
+                    alt={formatProductName(p.name)}
                     className="w-12 h-10 object-contain rounded-lg bg-cream-200 p-1 border border-neutral-200"
                   />
                   <div>
-                    <h4 className="text-sm font-bold text-neutral-900">{p.name}</h4>
+                    <h4 className="text-sm font-bold text-neutral-900">{formatProductName(p.name)}</h4>
                     <p className="text-xs text-neutral-500">
                       {p.category} • {p.style} • {p.frameType}
                     </p>

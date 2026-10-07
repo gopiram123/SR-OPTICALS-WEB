@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getProducts, updateProduct } from '../../services/api';
 import { Product } from '../../types';
+import { formatProductName } from '../../utils/formatters';
 
 export const AdminNewArrivalsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -62,7 +63,7 @@ export const AdminNewArrivalsPage: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                   <img src={p.images[0]} alt={p.name} className="w-12 h-10 object-contain rounded-lg bg-white p-1 shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-bold text-xs text-neutral-900 truncate">{p.name}</p>
+                    <p className="font-bold text-xs text-neutral-900 truncate">{formatProductName(p.name)}</p>
                     <p className="text-[11px] text-neutral-500">{p.category} • ₹{p.price.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
@@ -95,9 +96,9 @@ export const AdminNewArrivalsPage: React.FC = () => {
             {otherProducts.map((p) => (
               <div key={p.id} className="p-4 rounded-2xl bg-cream-100 border border-neutral-200 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <img src={p.images[0]} alt={p.name} className="w-12 h-10 object-contain rounded-lg bg-white p-1 shrink-0" />
+                  <img src={p.images[0]} alt={formatProductName(p.name)} className="w-12 h-10 object-contain rounded-lg bg-white p-1 shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-bold text-xs text-neutral-900 truncate">{p.name}</p>
+                    <p className="font-bold text-xs text-neutral-900 truncate">{formatProductName(p.name)}</p>
                     <p className="text-[11px] text-neutral-500">{p.category} • ₹{p.price.toLocaleString('en-IN')}</p>
                   </div>
                 </div>

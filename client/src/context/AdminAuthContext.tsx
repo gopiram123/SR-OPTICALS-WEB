@@ -1,16 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, isFirebaseConfigured } from '../services/firebase';
 import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   User
 } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
-interface AdminUser {
+export interface AdminUser {
+  uid: string;
   email: string;
   displayName?: string;
-  isDemo?: boolean;
+  isAdmin: boolean;
 }
 
 interface AdminAuthContextType {
@@ -22,8 +23,6 @@ interface AdminAuthContextType {
   logout: () => Promise<void>;
 }
 
-const DEMO_ADMIN_KEY = 'sropticals_demo_admin_session';
-
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -31,71 +30,46 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (isFirebaseConfigured && auth) {
-      const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-        if (user && user.email) {
-          setAdminUser({
-            email: user.email,
-            displayName: user.displayName || 'Admin',
-            isDemo: false
-          });
-        } else {
-          setAdminUser(null);
-        }
-        setIsLoading(false);
-      });
-      return () => unsubscribe();
-    } else {
-      // Check local demo admin session
-      try {
-        const saved = sessionStorage.getItem(DEMO_ADMIN_KEY);
-        if (saved) {
-          setAdminUser(JSON.parse(saved));
-        }
-      } catch (e) {
-        console.error("Error reading admin session", e);
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+      if (user && user.email) {
+        setAdminUser({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || user.email.split('@')[0] || 'Store Administrator',
+          isAdmin: true
+        });
+      } else {
+        setAdminUser(null);
       }
       setIsLoading(false);
-    }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, pass: string): Promise<void> => {
     setIsLoading(true);
     try {
-      if (isFirebaseConfigured && auth) {
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-        if (cred.user && cred.user.email) {
-          setAdminUser({
-            email: cred.user.email,
-            displayName: cred.user.displayName || 'Store Owner',
-            isDemo: false
-          });
-        }
-      } else {
-        // High fidelity demo admin authentication
-        // Default demo credentials: admin@sropticals.com / admin123 or any valid format password
-        if (email === 'admin@sropticals.com' && pass === 'admin123') {
-          const demoUser = {
-            email: 'admin@sropticals.com',
-            displayName: 'SR OPTICALS Owner',
-            isDemo: true
-          };
-          sessionStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(demoUser));
-          setAdminUser(demoUser);
-        } else {
-          throw new Error('Invalid credentials. Use admin@sropticals.com / admin123');
-        }
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
+      const user = cred.user;
+
+      if (!user || !user.email) {
+        throw new Error('Authentication succeeded but user profile is invalid.');
       }
+
+      setAdminUser({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0] || 'Store Administrator',
+        isAdmin: true
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = async (): Promise<void> => {
-    if (isFirebaseConfigured && auth) {
-      await firebaseSignOut(auth);
-    }
-    sessionStorage.removeItem(DEMO_ADMIN_KEY);
+    await firebaseSignOut(auth);
     setAdminUser(null);
   };
 
@@ -105,7 +79,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isAuthenticated: Boolean(adminUser),
         adminUser,
         isLoading,
-        isFirebaseActive: isFirebaseConfigured,
+        isFirebaseActive: true,
         login,
         logout
       }}

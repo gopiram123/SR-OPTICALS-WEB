@@ -4,6 +4,7 @@ import { Filter, X, RotateCcw, SlidersHorizontal, Search, Sparkles } from 'lucid
 import { getProducts, getCategories, DATA_CHANGED_EVENT } from '../services/api';
 import { Product, Category } from '../types';
 import { ProductCard } from '../components/products/ProductCard';
+import { formatProductName } from '../utils/formatters';
 
 export const CollectionsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -78,6 +79,7 @@ export const CollectionsPage: React.FC = () => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matches =
+          formatProductName(item.name).toLowerCase().includes(q) ||
           item.name.toLowerCase().includes(q) ||
           item.description.toLowerCase().includes(q) ||
           item.category.toLowerCase().includes(q) ||

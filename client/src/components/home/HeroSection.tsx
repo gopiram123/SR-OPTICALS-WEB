@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, CheckCircle2, MessageCircle } from 'lucide-react';
 import { HomepageConfig, Product } from '../../types';
 import { useShop } from '../../context/ShopContext';
+import { formatProductName } from '../../utils/formatters';
 
 interface HeroSectionProps {
   config: HomepageConfig['hero'];
@@ -102,7 +103,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ config, featuredProduc
                 <div className="absolute -bottom-6 -left-4 sm:-left-8 bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-gold-300/60 shadow-luxury max-w-xs animate-fadeIn hidden sm:flex items-center gap-3.5">
                   <img
                     src={featuredProduct.images[0]}
-                    alt={featuredProduct.name}
+                    alt={formatProductName(featuredProduct.name)}
                     className="w-14 h-14 object-contain rounded-xl bg-cream-200 p-1 shrink-0 border border-neutral-200"
                   />
                   <div className="min-w-0 flex-1">
@@ -113,14 +114,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ config, featuredProduc
                       to={`/product/${featuredProduct.id}`}
                       className="text-xs font-bold text-neutral-900 hover:text-brand-900 truncate block"
                     >
-                      {featuredProduct.name}
+                      {formatProductName(featuredProduct.name)}
                     </Link>
                     <p className="text-xs font-serif font-bold text-brand-950 mt-0.5">
                       ₹{featuredProduct.price.toLocaleString('en-IN')}
                     </p>
                   </div>
                   <a
-                    href={getWhatsAppUrl(featuredProduct.name, featuredProduct.sku)}
+                    href={getWhatsAppUrl(formatProductName(featuredProduct.name), featuredProduct.sku)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors shrink-0"

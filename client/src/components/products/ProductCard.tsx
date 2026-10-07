@@ -4,6 +4,7 @@ import { Heart, MessageCircle, ArrowUpRight } from 'lucide-react';
 import { Product } from '../../types';
 import { useWishlist } from '../../context/WishlistContext';
 import { useShop } from '../../context/ShopContext';
+import { formatProductName } from '../../utils/formatters';
 
 interface ProductCardProps {
   product: Product;
@@ -22,7 +23,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
           <img
             src={product.images[0]}
-            alt={product.name}
+            alt={formatProductName(product.name)}
             loading="lazy"
             className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
           />
@@ -76,7 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Product Title */}
           <Link to={`/product/${product.id}`} className="block group/title">
             <h3 className="font-serif text-base sm:text-lg font-bold text-neutral-900 line-clamp-1 group-hover/title:text-brand-800 transition-colors">
-              {product.name}
+              {formatProductName(product.name)}
             </h3>
           </Link>
 
@@ -103,10 +104,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex items-center gap-1.5">
             {/* Direct WhatsApp Enquiry */}
             <a
-              href={getWhatsAppUrl(product.name, product.sku)}
+              href={getWhatsAppUrl(formatProductName(product.name), product.sku)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Enquire about ${product.name} on WhatsApp`}
+              aria-label={`Enquire about ${formatProductName(product.name)} on WhatsApp`}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               <MessageCircle className="w-4 h-4 text-emerald-600" />

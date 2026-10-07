@@ -49,10 +49,10 @@ export const AdminReviewsPage: React.FC = () => {
     setFormData({
       customerName: r.customerName,
       rating: r.rating,
-      comment: r.comment,
-      date: r.date,
+      comment: r.reviewText || r.comment || '',
+      date: r.date || 'Recent',
       verified: r.verified ?? true,
-      isVisible: r.isVisible
+      isVisible: Boolean(r.visible ?? r.isVisible ?? true)
     });
     setIsModalOpen(true);
   };
@@ -60,16 +60,28 @@ export const AdminReviewsPage: React.FC = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = {
+        customerName: formData.customerName,
+        rating: formData.rating,
+        reviewText: formData.comment,
+        comment: formData.comment,
+        visible: formData.isVisible,
+        isVisible: formData.isVisible,
+        date: formData.date,
+        verified: formData.verified
+      };
       if (editingReview) {
-        await updateReview(editingReview.id, formData);
+        await updateReview(editingReview.id, payload);
       } else {
-        await createReview(formData);
+        await createReview(payload);
       }
       setIsModalOpen(false);
       loadReviews();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('Failed to save review.');
+      const code = e?.code ? `[${e.code}] ` : '';
+      const msg = e?.message || String(e);
+      alert(`Failed to save review:\n\n${code}${msg}`);
     }
   };
 

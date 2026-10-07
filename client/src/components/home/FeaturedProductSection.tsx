@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles, MessageCircle, ArrowRight, ShieldCheck, Check } from 'lucide-react';
 import { Product } from '../../types';
 import { useShop } from '../../context/ShopContext';
+import { formatProductName } from '../../utils/formatters';
 
 interface FeaturedProductSectionProps {
   product?: Product | null;
@@ -33,7 +34,7 @@ export const FeaturedProductSection: React.FC<FeaturedProductSectionProps> = ({ 
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white p-6 sm:p-8 flex items-center justify-center border border-neutral-200/80 shadow-card">
                 <img
                   src={product.images[0]}
-                  alt={product.name}
+                  alt={formatProductName(product.name)}
                   className="w-full h-full object-contain mix-blend-multiply hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-4 left-4">
@@ -52,7 +53,7 @@ export const FeaturedProductSection: React.FC<FeaturedProductSectionProps> = ({ 
                   <span>Featured Eyewear Spotlight</span>
                 </div>
                 <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-950">
-                  {product.name}
+                  {formatProductName(product.name)}
                 </h2>
                 <p className="text-xs sm:text-sm font-semibold text-neutral-500">
                   Category: {product.category} • {product.gender} • {product.style} Style
@@ -90,7 +91,7 @@ export const FeaturedProductSection: React.FC<FeaturedProductSectionProps> = ({ 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <a
-                  href={getWhatsAppUrl(product.name, product.sku)}
+                  href={getWhatsAppUrl(formatProductName(product.name), product.sku)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all"

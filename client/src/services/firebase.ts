@@ -1,36 +1,35 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { getAuth, Auth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || ""
+// Exact Firebase configuration for the SR OPTICALS project
+export const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDTGm63HgyE9ny6COSsLW80tsZ5IXDeGX4",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "sr-opticals.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "sr-opticals",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "sr-opticals.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "194428231543",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:194428231543:web:aa386d3f999c84a5790b72"
 };
 
-export const isFirebaseConfigured = Boolean(
-  firebaseConfig.apiKey && firebaseConfig.projectId
-);
+// Initialize Firebase App
+export const app: FirebaseApp = getApps().length === 0 
+  ? initializeApp(firebaseConfig) 
+  : getApps()[0];
 
-let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-let storage: FirebaseStorage | null = null;
-
-if (isFirebaseConfigured) {
-  try {
-    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-    auth = getAuth(app);
-    db = getFirestore(app);
-    storage = getStorage(app);
-    console.info("Firebase successfully initialized with provided credentials.");
-  } catch (err) {
-    console.warn("Failed to initialize Firebase with environment keys, falling back to local persistent store.", err);
-  }
+// Initialize Firebase Auth with persistent session
+export const auth: Auth = getAuth(app);
+try {
+  setPersistence(auth, browserLocalPersistence).catch((err) => {
+    console.warn("Unable to set browserLocalPersistence for auth:", err);
+  });
+} catch (e) {
+  // Ignore in non-browser environment
 }
 
-export { app, auth, db, storage };
+// Initialize Cloud Firestore
+export const db: Firestore = getFirestore(app);
+
+export const isFirebaseConfigured = true;
+
+export default app;

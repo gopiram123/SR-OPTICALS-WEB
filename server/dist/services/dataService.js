@@ -70,7 +70,7 @@ const initialCategories = [
 const initialProducts = [
     {
         id: "prod-1",
-        name: "SR Royal Obsidian Acetate",
+        name: "Royal Obsidian Acetate",
         price: 3499,
         description: "Handcrafted Italian acetate eyeglasses featuring custom barrel hinges, bevelled temples, and a commanding square profile.",
         category: "Men",
@@ -94,7 +94,7 @@ const initialProducts = [
     },
     {
         id: "prod-2",
-        name: "SR Aureus Pure Titanium Round",
+        name: "Aureus Pure Titanium Round",
         price: 4899,
         description: "Japanese aero-grade beta titanium circular frame with fine hand-engraved filigree bridge. Featherweight 14g construction.",
         category: "Men",
@@ -118,7 +118,7 @@ const initialProducts = [
     },
     {
         id: "prod-3",
-        name: "SR Luna Sculpted Cat-Eye",
+        name: "Luna Sculpted Cat-Eye",
         price: 3250,
         description: "Graceful feminine contouring with subtle wing angles and multi-layered tortoiseshell amber tones.",
         category: "Women",

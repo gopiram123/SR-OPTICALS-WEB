@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, Trash2, MessageCircle, Phone, ArrowRight, Glasses } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useShop } from '../context/ShopContext';
+import { formatProductName } from '../utils/formatters';
 
 export const WishlistPage: React.FC = () => {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -42,7 +43,7 @@ export const WishlistPage: React.FC = () => {
                       <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
                         <img
                           src={product.images[0]}
-                          alt={product.name}
+                          alt={formatProductName(product.name)}
                           className="w-full h-full object-contain mix-blend-multiply hover:scale-105 transition-transform duration-300"
                         />
                       </Link>
@@ -64,7 +65,7 @@ export const WishlistPage: React.FC = () => {
 
                     <Link to={`/product/${product.id}`} className="block">
                       <h3 className="font-serif text-lg font-bold text-neutral-900 hover:text-brand-900 truncate">
-                        {product.name}
+                        {formatProductName(product.name)}
                       </h3>
                     </Link>
 
@@ -76,7 +77,7 @@ export const WishlistPage: React.FC = () => {
                   {/* Actions */}
                   <div className="pt-4 mt-4 border-t border-neutral-100 flex flex-col gap-2">
                     <a
-                      href={getWhatsAppUrl(product.name, product.sku)}
+                      href={getWhatsAppUrl(formatProductName(product.name), product.sku)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"

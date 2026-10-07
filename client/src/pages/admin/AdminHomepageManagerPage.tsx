@@ -4,6 +4,8 @@ import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getHomepageConfig, updateHomepageConfig, getProducts } from '../../services/api';
 import { HomepageConfig, Product } from '../../types';
 import { initialHomepageConfig } from '../../services/mockData';
+import { formatProductName } from '../../utils/formatters';
+import { ImageUploadField } from '../../components/admin/ImageUploadField';
 
 export const AdminHomepageManagerPage: React.FC = () => {
   const [config, setConfig] = useState<HomepageConfig>(initialHomepageConfig);
@@ -22,9 +24,11 @@ export const AdminHomepageManagerPage: React.FC = () => {
       await updateHomepageConfig(config);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('Failed to save homepage settings.');
+      const code = e?.code ? `[${e.code}] ` : '';
+      const msg = e?.message || String(e);
+      alert(`Failed to save homepage settings:\n\n${code}${msg}`);
     }
   };
 
@@ -128,14 +132,14 @@ export const AdminHomepageManagerPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
-                  Hero Image URL (Universal Spectacles Photo)
-                </label>
-                <input
-                  type="url"
+                <ImageUploadField
+                  label="Hero Banner Photograph"
+                  sublabel="Direct upload to Firebase Storage (universal frames focus)"
                   value={config.hero.imageUrl}
-                  onChange={(e) => setConfig({ ...config, hero: { ...config.hero, imageUrl: e.target.value } })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm"
+                  onChange={(url) => setConfig({ ...config, hero: { ...config.hero, imageUrl: url } })}
+                  folder="homepage"
+                  aspectRatio="wide"
+                  required
                 />
               </div>
             </div>
@@ -206,7 +210,7 @@ export const AdminHomepageManagerPage: React.FC = () => {
                   className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm"
                 >
                   {products.map(p => (
-                    <option key={p.id} value={p.id}>{p.name} (₹{p.price})</option>
+                    <option key={p.id} value={p.id}>{formatProductName(p.name)} (₹{p.price})</option>
                   ))}
                 </select>
               </div>
@@ -222,7 +226,7 @@ export const AdminHomepageManagerPage: React.FC = () => {
                 >
                   <option value="">Default Eyeglasses</option>
                   {products.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
+                    <option key={p.id} value={p.id}>{formatProductName(p.name)}</option>
                   ))}
                 </select>
               </div>
@@ -238,7 +242,7 @@ export const AdminHomepageManagerPage: React.FC = () => {
                 >
                   <option value="">Default Sunglasses</option>
                   {products.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
+                    <option key={p.id} value={p.id}>{formatProductName(p.name)}</option>
                   ))}
                 </select>
               </div>
@@ -328,14 +332,14 @@ export const AdminHomepageManagerPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
-                Showroom Image URL
-              </label>
-              <input
-                type="url"
+              <ImageUploadField
+                label="About Boutique Photograph"
+                sublabel="Direct upload to Firebase Storage"
                 value={config.aboutSnippet.imageUrl}
-                onChange={(e) => setConfig({ ...config, aboutSnippet: { ...config.aboutSnippet, imageUrl: e.target.value } })}
-                className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm"
+                onChange={(url) => setConfig({ ...config, aboutSnippet: { ...config.aboutSnippet, imageUrl: url } })}
+                folder="homepage"
+                aspectRatio="wide"
+                required
               />
             </div>
           </div>

@@ -69,7 +69,7 @@ export const initialCategories: Category[] = [
 export const initialProducts: Product[] = [
   {
     id: "prod-1",
-    name: "SR Royal Obsidian Acetate",
+    name: "Royal Obsidian Acetate",
     price: 3499,
     description: "Handcrafted Italian acetate eyeglasses featuring custom barrel hinges, bevelled temples, and a commanding square profile. Engineered for all-day comfort with balanced weight distribution.",
     category: "Men",
@@ -93,7 +93,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-2",
-    name: "SR Aureus Pure Titanium Round",
+    name: "Aureus Pure Titanium Round",
     price: 4899,
     description: "Japanese aero-grade beta titanium circular frame with fine hand-engraved filigree bridge. Featherweight construction weighing only 14 grams, fitted with hypoallergenic silicone nose pads.",
     category: "Men",
@@ -117,7 +117,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-3",
-    name: "SR Luna Sculpted Cat-Eye",
+    name: "Luna Sculpted Cat-Eye",
     price: 3250,
     description: "Graceful feminine contouring with subtle wing angles and multi-layered tortoiseshell amber tones. Offers high visual impact and an effortless luxury statement.",
     category: "Women",
@@ -141,7 +141,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-4",
-    name: "SR Minimalist Aviator Precision",
+    name: "Minimalist Aviator Precision",
     price: 2899,
     description: "Modernized dual-bridge aviator frame sculpted from memory alloy metal. Features slender temples with ergonomic temple tips for seamless daily wear.",
     category: "Men",
@@ -164,7 +164,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-5",
-    name: "SR Horizon Rimless Executive",
+    name: "Horizon Rimless Executive",
     price: 4200,
     description: "Ultralight rimless spectacles engineered with high-tensile titanium mountings and diamond-cut lens bevels. Virtually weightless on the face with zero visual obstruction.",
     category: "Men",
@@ -187,7 +187,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-6",
-    name: "SR Junior Flex Active TR90",
+    name: "Junior Flex Active TR90",
     price: 1850,
     description: "Virtually unbreakable, bend-resistant TR90 frame for children. Equipped with wrap-around flex hinges and 360-degree soft comfort ear socks.",
     category: "Children",
@@ -210,7 +210,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-7",
-    name: "SR Clarity Blue-Shield HD Lenses",
+    name: "Clarity Blue-Shield HD Lenses",
     price: 2400,
     description: "Custom digital surfaced spectacle lenses filtering 99.8% of harmful high-energy blue-violet light. Includes multi-layer hydrophobic, anti-static, and oleophobic coatings.",
     category: "Lenses",
@@ -233,7 +233,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: "prod-8",
-    name: "SR Riviera Half-Rim Clubmaster",
+    name: "Riviera Half-Rim Clubmaster",
     price: 3650,
     description: "Timeless vintage intellectual aesthetics with polished black acetate browline and gold plated lower wire frame. A masterwork of mid-century optical elegance.",
     category: "Men",

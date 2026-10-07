@@ -3,19 +3,21 @@ import { Plus, Edit2, Trash2, Eye, EyeOff, X, ArrowUp, ArrowDown } from 'lucide-
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../../services/api';
 import { Category } from '../../types';
+import { ImageUploadField } from '../../components/admin/ImageUploadField';
 
 export const AdminCategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',
-    imageUrl: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80',
+    image: '',
     order: 1,
-    isVisible: true
+    visible: true
   });
 
   const loadCategories = async () => {
@@ -37,9 +39,9 @@ export const AdminCategoriesPage: React.FC = () => {
       name: '',
       slug: '',
       description: '',
-      imageUrl: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80',
+      image: '',
       order: categories.length + 1,
-      isVisible: true
+      visible: true
     });
     setIsModalOpen(true);
   };
@@ -48,18 +50,23 @@ export const AdminCategoriesPage: React.FC = () => {
     setEditingCategory(c);
     setFormData({
       name: c.name,
-      slug: c.slug,
+      slug: c.slug || c.name.toLowerCase().replace(/\s+/g, '-'),
       description: c.description || '',
-      imageUrl: c.imageUrl,
+      image: c.image || c.imageUrl || '',
       order: c.order,
-      isVisible: c.isVisible
+      visible: Boolean(c.visible ?? c.isVisible ?? true)
     });
     setIsModalOpen(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.image) {
+      alert('Please upload a cover image for this category.');
+      return;
+    }
     const slug = formData.slug.trim() || formData.name.toLowerCase().replace(/\s+/g, '-');
+    setIsSaving(true);
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, { ...formData, slug });
@@ -68,9 +75,13 @@ export const AdminCategoriesPage: React.FC = () => {
       }
       setIsModalOpen(false);
       loadCategories();
-    } catch (e) {
-      console.error(e);
-      alert('Error saving category.');
+    } catch (err: any) {
+      console.error('Error saving category:', err);
+      const code = err?.code ? `[${err.code}] ` : '';
+      const msg = err?.message || String(err);
+      alert(`Error saving category:\n\n${code}${msg}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -139,7 +150,7 @@ export const AdminCategoriesPage: React.FC = () => {
                 {/* Category Image Preview */}
                 <div className="relative aspect-[4/3] bg-cream-200">
                   <img
-                    src={cat.imageUrl}
+                    src={cat.image || cat.imageUrl}
                     alt={cat.name}
                     className="w-full h-full object-cover"
                   />
@@ -233,18 +244,15 @@ export const AdminCategoriesPage: React.FC = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
-                    Cover Image URL *
-                  </label>
-                  <input
-                    type="url"
-                    required
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-none focus:border-brand-900"
-                  />
-                </div>
+                <ImageUploadField
+                  label="Category Cover Image"
+                  sublabel="Shown in navigation & category collections"
+                  value={formData.image}
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  folder="categories"
+                  aspectRatio="wide"
+                  required
+                />
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
@@ -275,8 +283,8 @@ export const AdminCategoriesPage: React.FC = () => {
                     <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-neutral-700">
                       <input
                         type="checkbox"
-                        checked={formData.isVisible}
-                        onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                        checked={formData.visible}
+                        onChange={(e) => setFormData({ ...formData, visible: e.target.checked })}
                         className="rounded text-brand-900 w-4 h-4"
                       />
                       <span>Visible Publicly</span>
@@ -294,9 +302,10 @@ export const AdminCategoriesPage: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-full bg-brand-900 text-gold-300 text-xs font-bold uppercase tracking-wider"
+                    disabled={isSaving}
+                    className="px-5 py-2.5 rounded-full bg-brand-900 text-gold-300 text-xs font-bold uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
                   >
-                    Save Category
+                    <span>{isSaving ? 'Saving Category...' : 'Save Category'}</span>
                   </button>
                 </div>
               </form>

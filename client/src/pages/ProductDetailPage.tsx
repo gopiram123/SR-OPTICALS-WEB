@@ -14,6 +14,7 @@ import { Product } from '../types';
 import { useWishlist } from '../context/WishlistContext';
 import { useShop } from '../context/ShopContext';
 import { ProductCard } from '../components/products/ProductCard';
+import { formatProductName } from '../utils/formatters';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,7 +116,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-cream-200/80 p-6 flex items-center justify-center border border-neutral-200">
                 <img
                   src={product.images[selectedImageIndex] || product.images[0]}
-                  alt={`${product.name} frame view`}
+                  alt={`${formatProductName(product.name)} frame view`}
                   className="w-full h-full object-contain mix-blend-multiply transition-all duration-300"
                 />
 
@@ -193,7 +194,7 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
 
                 <h1 className="font-serif text-3xl sm:text-4xl font-bold text-neutral-950 leading-tight">
-                  {product.name}
+                  {formatProductName(product.name)}
                 </h1>
 
                 {/* Price Display */}
@@ -247,7 +248,7 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                   {/* WhatsApp Enquiry Button */}
                   <a
-                    href={getWhatsAppUrl(product.name, product.sku)}
+                    href={getWhatsAppUrl(formatProductName(product.name), product.sku)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 py-4 px-6 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all"

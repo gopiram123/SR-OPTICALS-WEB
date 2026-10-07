@@ -5,6 +5,7 @@ import { useShop } from '../../context/ShopContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { getProducts } from '../../services/api';
 import { Product } from '../../types';
+import { formatProductName } from '../../utils/formatters';
 
 export const Navbar: React.FC = () => {
   const { shopInfo, getWhatsAppUrl, getCallUrl } = useShop();
@@ -56,6 +57,7 @@ export const Navbar: React.FC = () => {
     setIsSearching(true);
     const q = searchTerm.toLowerCase().trim();
     const matches = allProducts.filter(p =>
+      formatProductName(p.name).toLowerCase().includes(q) ||
       p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q) ||
       p.style.toLowerCase().includes(q) ||
@@ -191,12 +193,12 @@ export const Navbar: React.FC = () => {
                       >
                         <img
                           src={product.images[0]}
-                          alt={product.name}
+                          alt={formatProductName(product.name)}
                           className="w-12 h-10 object-cover rounded-lg border border-neutral-200"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-neutral-900 truncate">
-                            {product.name}
+                            {formatProductName(product.name)}
                           </p>
                           <p className="text-xs text-neutral-500">
                             {product.category} • {product.style} • ₹{product.price.toLocaleString('en-IN')}

@@ -29,6 +29,8 @@ import { AdminStorePhotosPage } from './pages/admin/AdminStorePhotosPage';
 import { AdminReviewsPage } from './pages/admin/AdminReviewsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 
+import { ProtectedRoute } from './components/admin/ProtectedRoute';
+
 // Component to handle layout switching between Customer and Admin
 const LayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -57,7 +59,7 @@ export function App() {
           <AdminAuthProvider>
             <LayoutWrapper>
               <Routes>
-                {/* Customer Routes */}
+                {/* Customer Routes (Public) */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/collections" element={<CollectionsPage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
@@ -66,17 +68,19 @@ export function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
 
-                {/* Admin Routes */}
+                {/* Admin Authentication Route (Public) */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route path="/admin" element={<AdminDashboardPage />} />
-                <Route path="/admin/products" element={<AdminProductsPage />} />
-                <Route path="/admin/categories" element={<AdminCategoriesPage />} />
-                <Route path="/admin/new-arrivals" element={<AdminNewArrivalsPage />} />
-                <Route path="/admin/homepage" element={<AdminHomepageManagerPage />} />
-                <Route path="/admin/store-info" element={<AdminStoreInfoPage />} />
-                <Route path="/admin/store-photos" element={<AdminStorePhotosPage />} />
-                <Route path="/admin/reviews" element={<AdminReviewsPage />} />
-                <Route path="/admin/settings" element={<AdminSettingsPage />} />
+
+                {/* Protected Admin Routes */}
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+                <Route path="/admin/products" element={<ProtectedRoute><AdminProductsPage /></ProtectedRoute>} />
+                <Route path="/admin/categories" element={<ProtectedRoute><AdminCategoriesPage /></ProtectedRoute>} />
+                <Route path="/admin/new-arrivals" element={<ProtectedRoute><AdminNewArrivalsPage /></ProtectedRoute>} />
+                <Route path="/admin/homepage" element={<ProtectedRoute><AdminHomepageManagerPage /></ProtectedRoute>} />
+                <Route path="/admin/store-info" element={<ProtectedRoute><AdminStoreInfoPage /></ProtectedRoute>} />
+                <Route path="/admin/store-photos" element={<ProtectedRoute><AdminStorePhotosPage /></ProtectedRoute>} />
+                <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
+                <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
 
                 {/* 404 Route */}
                 <Route path="*" element={<NotFoundPage />} />

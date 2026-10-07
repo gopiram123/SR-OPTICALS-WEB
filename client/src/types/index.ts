@@ -2,38 +2,52 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  description: string;
   category: 'Men' | 'Women' | 'Children' | 'Lenses' | string;
   gender: 'Men' | 'Women' | 'Unisex' | 'Kids';
   style: 'Classic' | 'Modern' | 'Premium' | 'Everyday' | string;
+  description: string;
   frameType: 'Full Rim' | 'Half Rim' | 'Rimless';
+  frameShape?: string; // e.g. "Square", "Round", "Cat-Eye", "Aviator", "Geometric"
   material: 'Acetate' | 'Titanium' | 'Metal' | 'TR90' | 'Mixed';
   colour: string;
+  dimensions?: string; // e.g. "53-18-145"
+  sku?: string;
   availability: 'In Stock' | 'Made to Order' | 'Out of Stock';
+  primaryImage?: string;
   images: string[];
-  isNew: boolean;
+  isNewArrival?: boolean;
   isFeatured: boolean;
   isTrending: boolean;
-  sku?: string;
-  dimensions?: string; // e.g. "53-18-145"
+  newArrivalOrder?: number;
+  trendingOrder?: number;
+  featuredOrder?: number;
   createdAt?: string;
   updatedAt?: string;
+
+  // Backward compatibility alias
+  isNew?: boolean;
 }
 
 export interface Category {
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
-  imageUrl: string;
+  image?: string;
+  visible?: boolean;
   order: number;
-  isVisible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Backward compatibility aliases
+  imageUrl?: string;
+  isVisible?: boolean;
 }
 
 export interface ShopInfo {
   shopName: string;
   tagline?: string;
-  logoUrl?: string;
+  logo?: string;
   phone: string;
   whatsapp: string;
   email: string;
@@ -45,12 +59,20 @@ export interface ShopInfo {
     pincode: string;
   };
   mapsUrl: string;
-  mapsEmbedUrl: string;
+  mapsEmbedUrl?: string;
   openingHours: {
     days: string;
     hours: string;
   }[];
-  socials: {
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    google?: string;
+  };
+
+  // Backward compatibility aliases
+  logoUrl?: string;
+  socials?: {
     instagram?: string;
     facebook?: string;
     google?: string;
@@ -80,21 +102,52 @@ export interface HomepageConfig {
     description: string;
     imageUrl: string;
   };
+  updatedAt?: string;
 }
 
 export interface Review {
   id: string;
   customerName: string;
+  reviewText?: string;
   rating: number; // 1 to 5
-  comment: string;
-  date: string;
+  visible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Backward compatibility aliases
+  comment?: string;
+  date?: string;
   verified?: boolean;
-  isVisible: boolean;
+  isVisible?: boolean;
 }
 
 export interface StorePhoto {
   id: string;
-  url: string;
-  caption?: string;
+  image?: string;
+  title?: string;
+  description?: string;
+  visible?: boolean;
   order: number;
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Backward compatibility aliases
+  url?: string;
+  caption?: string;
+  isVisible?: boolean;
+}
+
+export interface StoreSettings {
+  announcement?: string;
+  announcementVisible?: boolean;
+  currency?: string;
+  maintenanceMode?: boolean;
+  updatedAt?: string;
+}
+
+export interface AdminRecord {
+  uid: string;
+  email: string;
+  role: 'admin';
+  createdAt?: string;
 }

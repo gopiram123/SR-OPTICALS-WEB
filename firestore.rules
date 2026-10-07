@@ -3,50 +3,50 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is authenticated admin
-    function isAdmin() {
-      return request.auth != null;
-    }
-
-    // Public catalogue: Anyone can read products, only admin can create/update/delete
-    match /products/{productId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // Categories: Anyone can read visible categories, only admin can write
+    // SR OPTICALS Security Rules
+    // 1. Public Read: Any customer can view products, categories, homepage, reviews, store photos, and settings
+    // 2. Authenticated Write: ANY user authenticated via Firebase Authentication can create, update, and delete
+    
+    // Explicit Collection Rules
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if request.auth != null;
     }
 
-    // Homepage configuration: Anyone can read, only admin can update
-    match /homepage/{document=**} {
+    match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if request.auth != null;
     }
 
-    // Shop Information: Publicly readable, only admin can update
     match /shopInfo/{document=**} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if request.auth != null;
     }
 
-    // Reviews: Anyone can read visible reviews, only admin can write/moderate
+    match /homepage/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     match /reviews/{reviewId} {
-      allow read: if resource.data.isVisible == true || isAdmin();
-      allow write: if isAdmin();
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
-    // Store Photos gallery: Publicly readable, only admin can write
     match /storePhotos/{photoId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if request.auth != null;
     }
 
-    // Default deny all other collections
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Global fallback for any nested or future collections
     match /{document=**} {
-      allow read, write: if false;
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }

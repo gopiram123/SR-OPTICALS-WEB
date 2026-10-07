@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, CheckCircle2, Phone, MessageCircle, Mail, MapPin, Clock, Globe, Plus, Trash2 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
+import { ImageUploadField } from '../../components/admin/ImageUploadField';
 import { getShopInfo, updateShopInfo } from '../../services/api';
 import { ShopInfo } from '../../types';
 import { initialShopInfo } from '../../services/mockData';
@@ -19,9 +20,11 @@ export const AdminStoreInfoPage: React.FC = () => {
       await updateShopInfo(shopInfo);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('Failed to update shop details.');
+      const code = e?.code ? `[${e.code}] ` : '';
+      const msg = e?.message || String(e);
+      alert(`Failed to update shop details:\n\n${code}${msg}`);
     }
   };
 
@@ -113,6 +116,17 @@ export const AdminStoreInfoPage: React.FC = () => {
                   onChange={(e) => setShopInfo({ ...shopInfo, tagline: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-none focus:border-brand-900"
                   placeholder="e.g. Precision Optics & Handcrafted Luxury Frames"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <ImageUploadField
+                  label="Store Brand Logo"
+                  sublabel="Upload store logo image (square or horizontal transparent PNG / WebP / JPG)"
+                  value={shopInfo.logo || shopInfo.logoUrl || ''}
+                  onChange={(url) => setShopInfo({ ...shopInfo, logo: url, logoUrl: url })}
+                  folder="brand"
+                  aspectRatio="square"
                 />
               </div>
 

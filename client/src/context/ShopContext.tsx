@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ShopInfo } from '../types';
 import { getShopInfo, DATA_CHANGED_EVENT } from '../services/api';
 import { initialShopInfo } from '../services/mockData';
+import { formatProductName } from '../utils/formatters';
 
 interface ShopContextType {
   shopInfo: ShopInfo;
@@ -53,7 +54,8 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let text = `Hello ${shopInfo.shopName}, I would like to enquire about eyewear availability at your store.`;
     
     if (productName) {
-      text = `Hello ${shopInfo.shopName}, I'm interested in the "${productName}"${sku ? ` (SKU: ${sku})` : ''}. Please let me know its availability, lens options, and price details.`;
+      const cleanProductName = formatProductName(productName);
+      text = `Hello ${shopInfo.shopName}, I'm interested in the "${cleanProductName}"${sku ? ` (SKU: ${sku})` : ''}. Please let me know its availability, lens options, and price details.`;
     }
     
     return `https://wa.me/${rawNumber}?text=${encodeURIComponent(text)}`;

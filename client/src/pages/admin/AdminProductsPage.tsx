@@ -11,7 +11,9 @@ import {
   Flame,
   AlertTriangle,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Star,
+  RefreshCw
 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import {
@@ -22,6 +24,8 @@ import {
   deleteProduct
 } from '../../services/api';
 import { Product, Category } from '../../types';
+import { formatProductName } from '../../utils/formatters';
+import { MultiImageUpload } from '../../components/admin/MultiImageUpload';
 
 export const AdminProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,6 +38,7 @@ export const AdminProductsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteCandidate, setDeleteCandidate] = useState<Product | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -44,18 +49,17 @@ export const AdminProductsPage: React.FC = () => {
     gender: 'Unisex' as Product['gender'],
     style: 'Classic' as Product['style'],
     frameType: 'Full Rim' as Product['frameType'],
+    frameShape: 'Classic Rectangular',
     material: 'Acetate' as Product['material'],
-    colour: 'Black',
+    colour: 'Deep Black',
     availability: 'In Stock' as Product['availability'],
-    images: ['https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80'],
-    isNew: true,
+    images: [] as string[],
+    isNewArrival: true,
     isFeatured: false,
     isTrending: false,
     sku: '',
     dimensions: '52-18-140'
   });
-
-  const [imageUrlInput, setImageUrlInput] = useState('');
 
   const loadData = async () => {
     try {
@@ -83,58 +87,42 @@ export const AdminProductsPage: React.FC = () => {
       gender: 'Unisex',
       style: 'Classic',
       frameType: 'Full Rim',
+      frameShape: 'Classic Rectangular',
       material: 'Acetate',
       colour: 'Deep Black',
       availability: 'In Stock',
-      images: ['https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80'],
-      isNew: true,
+      images: [],
+      isNewArrival: true,
       isFeatured: false,
       isTrending: false,
       sku: `SRO-${Date.now().toString().slice(-4)}`,
       dimensions: '52-18-140'
     });
-    setImageUrlInput('');
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (p: Product) => {
     setEditingProduct(p);
     setFormData({
-      name: p.name,
+      name: formatProductName(p.name),
       price: p.price,
       description: p.description,
       category: p.category,
       gender: p.gender,
       style: p.style,
       frameType: p.frameType,
+      frameShape: p.frameShape || 'Classic Rectangular',
       material: p.material,
       colour: p.colour,
       availability: p.availability,
       images: [...p.images],
-      isNew: p.isNew,
+      isNewArrival: Boolean(p.isNewArrival ?? p.isNew ?? false),
       isFeatured: p.isFeatured,
       isTrending: p.isTrending,
       sku: p.sku || '',
       dimensions: p.dimensions || '52-18-140'
     });
-    setImageUrlInput('');
     setIsModalOpen(true);
-  };
-
-  const handleAddImageUrl = () => {
-    if (!imageUrlInput.trim()) return;
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, imageUrlInput.trim()]
-    }));
-    setImageUrlInput('');
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -144,6 +132,7 @@ export const AdminProductsPage: React.FC = () => {
       return;
     }
 
+    setIsSaving(true);
     try {
       if (editingProduct) {
         await updateProduct(editingProduct.id, formData);
@@ -152,9 +141,13 @@ export const AdminProductsPage: React.FC = () => {
       }
       setIsModalOpen(false);
       loadData();
-    } catch (err) {
-      console.error('Error saving product', err);
-      alert('Failed to save product.');
+    } catch (err: any) {
+      console.error('Error saving product:', err);
+      const code = err?.code ? `[${err.code}] ` : '';
+      const msg = err?.message || String(err);
+      alert(`Failed to save product:\n\n${code}${msg}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -171,9 +164,12 @@ export const AdminProductsPage: React.FC = () => {
   };
 
   // Quick direct toggle functions
-  const handleToggle = async (productId: string, field: 'isNew' | 'isFeatured' | 'isTrending', currentVal: boolean) => {
+  const handleToggle = async (productId: string, field: 'isNewArrival' | 'isFeatured' | 'isTrending' | 'isNew', currentVal: boolean) => {
     try {
-      await updateProduct(productId, { [field]: !currentVal });
+      const updatePayload = (field === 'isNewArrival' || field === 'isNew')
+        ? { isNewArrival: !currentVal, isNew: !currentVal }
+        : { [field]: !currentVal };
+      await updateProduct(productId, updatePayload);
       loadData();
     } catch (e) {
       console.error(e);
@@ -185,6 +181,7 @@ export const AdminProductsPage: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
+        formatProductName(p.name).toLowerCase().includes(q) ||
         p.name.toLowerCase().includes(q) ||
         p.sku?.toLowerCase().includes(q) ||
         p.material.toLowerCase().includes(q)
@@ -269,11 +266,11 @@ export const AdminProductsPage: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <img
                           src={p.images[0]}
-                          alt={p.name}
+                          alt={formatProductName(p.name)}
                           className="w-12 h-10 object-contain rounded-lg bg-cream-200 p-1 border border-neutral-200 shrink-0"
                         />
                         <div>
-                          <p className="font-bold text-neutral-900 text-sm">{p.name}</p>
+                          <p className="font-bold text-neutral-900 text-sm">{formatProductName(p.name)}</p>
                           <p className="text-[11px] text-neutral-400">
                             {p.sku || 'No SKU'} • {p.material} • {p.colour}
                           </p>
@@ -307,10 +304,10 @@ export const AdminProductsPage: React.FC = () => {
                     <td className="py-4 px-4">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
-                          onClick={() => handleToggle(p.id, 'isNew', p.isNew)}
-                          title={`New Arrival: ${p.isNew ? 'Active' : 'Inactive'}`}
+                          onClick={() => handleToggle(p.id, 'isNewArrival', Boolean(p.isNewArrival ?? p.isNew))}
+                          title={`New Arrival: ${Boolean(p.isNewArrival ?? p.isNew) ? 'Active' : 'Inactive'}`}
                           className={`p-1.5 rounded-lg border transition-all ${
-                            p.isNew ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'bg-white border-neutral-200 text-neutral-300'
+                            Boolean(p.isNewArrival ?? p.isNew) ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'bg-white border-neutral-200 text-neutral-300'
                           }`}
                         >
                           <Sparkles className="w-3.5 h-3.5" />
@@ -399,7 +396,7 @@ export const AdminProductsPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. SR Royal Obsidian Acetate"
+                      placeholder="e.g. Royal Obsidian Acetate"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-none focus:border-brand-900"
@@ -501,8 +498,8 @@ export const AdminProductsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Construction: Frame Type, Material, Colour, Dimensions */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                {/* Construction: Frame Type, Frame Shape, Material, Colour, Dimensions */}
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
                   <div>
                     <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
                       Frame Type
@@ -515,6 +512,25 @@ export const AdminProductsPage: React.FC = () => {
                       <option value="Full Rim">Full Rim</option>
                       <option value="Half Rim">Half Rim</option>
                       <option value="Rimless">Rimless</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
+                      Frame Shape
+                    </label>
+                    <select
+                      value={formData.frameShape}
+                      onChange={(e) => setFormData({ ...formData, frameShape: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-xl border border-neutral-300 text-xs focus:outline-none focus:border-brand-900"
+                    >
+                      <option value="Classic Rectangular">Classic Rectangular</option>
+                      <option value="Square">Square</option>
+                      <option value="Round">Round</option>
+                      <option value="Cat-Eye">Cat-Eye</option>
+                      <option value="Aviator">Aviator</option>
+                      <option value="Geometric">Geometric</option>
+                      <option value="Browline">Browline</option>
                     </select>
                   </div>
 
@@ -576,53 +592,20 @@ export const AdminProductsPage: React.FC = () => {
                   />
                 </div>
 
-                {/* Image Management */}
-                <div className="space-y-3 bg-cream-100 p-4 rounded-2xl border border-neutral-200">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                    Product Photographs
-                  </label>
-                  
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="Paste Image URL (e.g. Unsplash or Cloud Storage)..."
-                      value={imageUrlInput}
-                      onChange={(e) => setImageUrlInput(e.target.value)}
-                      className="flex-1 px-4 py-2 rounded-xl border border-neutral-300 text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddImageUrl}
-                      className="px-4 py-2 rounded-xl bg-brand-900 text-gold-300 text-xs font-bold uppercase tracking-wider"
-                    >
-                      Add Photo
-                    </button>
-                  </div>
-
-                  {/* Image previews */}
-                  <div className="flex items-center gap-3 overflow-x-auto py-2">
-                    {formData.images.map((img, i) => (
-                      <div key={i} className="relative w-20 h-16 rounded-xl overflow-hidden bg-white p-1 border border-neutral-200 shrink-0 group">
-                        <img src={img} alt="Product" className="w-full h-full object-contain" />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(i)}
-                          className="absolute top-1 right-1 p-1 rounded-full bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {/* Direct Firebase Storage Multi-Image Upload */}
+                <MultiImageUpload
+                  images={formData.images}
+                  onChange={(newImages) => setFormData({ ...formData, images: newImages })}
+                  folder="products"
+                />
 
                 {/* Flags: New Arrival, Featured, Trending */}
                 <div className="flex items-center gap-6 pt-2">
                   <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-neutral-700">
                     <input
                       type="checkbox"
-                      checked={formData.isNew}
-                      onChange={(e) => setFormData({ ...formData, isNew: e.target.checked })}
+                      checked={formData.isNewArrival}
+                      onChange={(e) => setFormData({ ...formData, isNewArrival: e.target.checked })}
                       className="rounded text-brand-900 w-4 h-4"
                     />
                     <span>New Arrival</span>
@@ -660,9 +643,10 @@ export const AdminProductsPage: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-full bg-brand-900 hover:bg-brand-950 text-gold-300 font-bold text-xs uppercase tracking-wider"
+                    disabled={isSaving}
+                    className="px-6 py-2.5 rounded-full bg-brand-900 hover:bg-brand-950 text-gold-300 font-bold text-xs uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
                   >
-                    Save Eyewear Frame
+                    <span>{isSaving ? 'Saving Eyewear Frame...' : 'Save Eyewear Frame'}</span>
                   </button>
                 </div>
 
@@ -684,7 +668,7 @@ export const AdminProductsPage: React.FC = () => {
               </h3>
 
               <p className="text-sm text-neutral-600 leading-relaxed">
-                Are you sure you want to delete <span className="font-bold text-neutral-900">"{deleteCandidate.name}"</span>? This will remove the frame from customer catalog and wishlist.
+                Are you sure you want to delete <span className="font-bold text-neutral-900">"{formatProductName(deleteCandidate.name)}"</span>? This will remove the frame from customer catalog and wishlist.
               </p>
 
               <div className="pt-4 flex gap-3">
